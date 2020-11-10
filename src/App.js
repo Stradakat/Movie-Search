@@ -1,22 +1,38 @@
-import logo from './logo.svg';
+import React, { useEffect, useState, getUpcoming } from 'react';
+import axios from 'axios';
 import './App.css';
+import SearchMovies from './searchMovies';
+
+const api_key = '50c24dd81cf64f20150add7bc46eabb5';
+const BASE_URL = 'https://api.themoviedb.org/3';
+const getImage = (path) => `https://image.tmdb.org/t/p/w300/${path}`;
 
 function App() {
+  const [data, setData] = useState([]);
+
+  const api = axios.create({ baseURL: BASE_URL });
+
+  const getUpcoming = api.get('movie/upcoming', { params: { api_key } });
+
+  useEffect(() => {
+    getUpcoming.then((res) => {
+      setData(res.data.results);
+    });
+  }, []);
+
   return (
     <div className="App">
+      <h1 className="title">Movie Finder</h1>
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <SearchMovies />
+        <div className="grid">
+          {data.map((movie) => (
+            <div className="item">
+              <img src={getImage(movie.poster_path)} />
+              <p>{movie.original_title}</p>
+            </div>
+          ))}
+        </div>
       </header>
     </div>
   );
